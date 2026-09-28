@@ -74,6 +74,13 @@ app.use(
   }),
 )
 
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'INSEET API is running',
+    health: '/api/health',
+  })
+})
 app.use('/api', apiRoutes)
 app.use(notFound)
 app.use(errorHandler)
