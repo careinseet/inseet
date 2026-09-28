@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { ArrowLeft, ArrowRight, BriefcaseBusiness, Building2, Clock3, Eye, FileText, IndianRupee, Laptop, Lock, Mail, MapPin, Phone, SearchCheck, ShieldCheck, Sparkles, UserRound, UserRoundCheck, UsersRound, WalletCards, X } from 'lucide-react'
+import { ArrowLeft, ArrowRight, BriefcaseBusiness, Building2, Clock3, Eye, EyeOff, FileText, IndianRupee, Laptop, Lock, Mail, MapPin, Phone, SearchCheck, ShieldCheck, Sparkles, UserRound, UserRoundCheck, UsersRound, WalletCards, X } from 'lucide-react'
 import { Button } from '../components/Button'
 import { Section } from '../components/Section'
 import { getDashboardPath, storeAuthSession } from '../routes/authRouting'
@@ -459,13 +459,17 @@ function FreelancerRegisterModal({ onClose }) {
   )
 }
 
-function FreelancerModalField({ icon: Icon, label, ...props }) {
+function FreelancerModalField({ icon: Icon, label, type = 'text', ...props }) {
+  const [showPassword, setShowPassword] = useState(false)
+  const isPassword = type === 'password'
+
   return (
     <label>
       <span className="text-xs font-bold text-slate-700">{label}</span>
       <div className="mt-1.5 flex items-center gap-3 rounded-[7px] border border-slate-200 px-3 py-2.5 focus-within:border-[#ff8a00] focus-within:ring-4 focus-within:ring-orange-100">
         <Icon className="text-[#0057b8]" size={17} />
-        <input className="w-full bg-transparent text-sm font-semibold outline-none placeholder:text-slate-400" {...props} />
+        <input className="w-full bg-transparent text-sm font-semibold outline-none placeholder:text-slate-400" {...props} type={isPassword && showPassword ? 'text' : type} />
+        {isPassword && <button aria-label={showPassword ? 'Hide password' : 'Show password'} className="text-slate-400 transition hover:text-[#ff8a00]" onClick={() => setShowPassword((value) => !value)} type="button">{showPassword ? <EyeOff size={17} /> : <Eye size={17} />}</button>}
       </div>
     </label>
   )

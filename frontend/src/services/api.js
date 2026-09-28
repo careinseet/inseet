@@ -5,6 +5,10 @@ const API_BASE_URL = getApiBaseUrl()
 function getApiBaseUrl() {
   const configuredUrl = import.meta.env.VITE_API_URL || ''
 
+  if (isLocalFrontend() && (!configuredUrl || isFrontendDomain(configuredUrl))) {
+    return import.meta.env.VITE_LOCAL_API_URL || 'http://localhost:5050'
+  }
+
   if (configuredUrl && !isFrontendDomain(configuredUrl)) {
     return configuredUrl
   }
@@ -14,6 +18,11 @@ function getApiBaseUrl() {
   }
 
   return LIVE_API_BASE_URL
+}
+
+function isLocalFrontend() {
+  if (typeof window === 'undefined') return false
+  return ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname)
 }
 
 function isFrontendDomain(url) {
@@ -277,6 +286,13 @@ export const api = {
   employerLogin: (data) => apiRequest('/auth/login', { method: 'POST', body: JSON.stringify(data) }),
   employerRegister: (data) => apiRequest('/employers', { method: 'POST', body: JSON.stringify(data) }),
   currentRecruiterPackage: (email) => apiRequest(`/recruiter-package-subscriptions/current?recruiterEmail=${encodeURIComponent(email)}`, { authRequired: true }),
+  campaigns: (params = '?sort=-createdAt') => listAllWithAuth('campaigns', params),
+  createCampaign: (data) => apiRequest('/campaigns', { method: 'POST', body: JSON.stringify(data), authRequired: true }),
+  updateCampaign: (id, data) => apiRequest(`/campaigns/${id}`, { method: 'PUT', body: JSON.stringify(data), authRequired: true }),
+  deleteCampaign: (id) => apiRequest(`/campaigns/${id}`, { method: 'DELETE', authRequired: true }),
+  sendCampaign: (id) => apiRequest(`/campaigns/${id}/send`, { method: 'POST', authRequired: true }),
+  campaignFollowUps: () => apiRequest('/campaigns/follow-ups', { authRequired: true }),
+  markCampaignRecipientReplied: (campaignId, recipientId) => apiRequest(`/campaigns/${campaignId}/recipients/${recipientId}/replied`, { method: 'POST', authRequired: true }),
   recruiterRazorpayConfig: () => apiRequest('/recruiter-package-subscriptions/razorpay/config', { authRequired: true }),
   createRecruiterRazorpayOrder: (data) => apiRequest('/recruiter-package-subscriptions/razorpay/order', { method: 'POST', body: JSON.stringify(data), authRequired: true }),
   verifyRecruiterRazorpayPayment: (data) => apiRequest('/recruiter-package-subscriptions/razorpay/verify', { method: 'POST', body: JSON.stringify(data), authRequired: true }),

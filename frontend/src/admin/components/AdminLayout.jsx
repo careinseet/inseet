@@ -20,6 +20,7 @@ import {
   MapPin,
   Menu,
   MessageCircle,
+  Megaphone,
   Cloud,
   Plug,
   PlugZap,
@@ -85,6 +86,16 @@ const sidebarItems = [
   { label: 'Candidates', to: '/admin/candidates', icon: UsersRound, roles: ['Admin'] },
   { label: 'Hiring Team', to: '/admin/hiring-team', icon: UserPlus, roles: ['Admin'] },
   { label: 'Applications', to: '/admin/applications', icon: FileCheck2, roles: ['Admin'] },
+  {
+    label: 'Campaigns',
+    to: '/admin/campaigns',
+    icon: Megaphone,
+    roles: ['Admin', 'staff'],
+    children: [
+      { label: 'Email Marketing', to: '/admin/campaigns?channel=Email%20Marketing', icon: Mail },
+      { label: 'Mobile Message Marketing', to: '/admin/campaigns?channel=Mobile%20Message%20Marketing', icon: MessageCircle },
+    ],
+  },
   { label: 'Industry', to: '/admin/categories', icon: Building2, roles: ['Admin'] },
   { label: 'Company', to: '/admin/companies', icon: Building2, roles: ['Admin'] },
   {
@@ -263,14 +274,16 @@ export function AdminLayout() {
           return
         }
 
-        const [dashboardPayload, walletPayload] = isEmployer
+        const [dashboardPayload, walletPayload, followUpPayload] = isEmployer
           ? await Promise.all([
               api.employerDashboard(user.email),
               api.currentRecruiterPackage(user.email).catch(() => ({ data: null })),
+              Promise.resolve({ data: [] }),
             ])
           : await Promise.all([
               api.adminDashboard(),
               Promise.resolve({ data: null }),
+              ['Admin', 'staff'].includes(user?.role) ? api.campaignFollowUps().catch(() => ({ data: [] })) : Promise.resolve({ data: [] }),
             ])
         if (!mounted) return
 
@@ -279,7 +292,7 @@ export function AdminLayout() {
               dashboard: dashboardPayload.data || {},
               wallet: walletPayload.data || null,
             })
-          : buildAdminNotifications(dashboardPayload.data || {})
+          : buildAdminNotifications(dashboardPayload.data || {}, followUpPayload.data || [])
         const clearedIds = JSON.parse(localStorage.getItem(getNotificationClearKey(user)) || '[]')
         setClearedNotificationIds(clearedIds)
         setNotifications(nextNotifications.filter((item) => !clearedIds.includes(item.id)))
@@ -529,7 +542,7 @@ function buildRecruiterNotifications({ dashboard = {}, wallet = null }) {
   return items
 }
 
-function buildAdminNotifications(dashboard = {}) {
+function buildAdminNotifications(dashboard = {}, campaignFollowUps = []) {
   const metrics = dashboard.metrics || {}
   const pendingReviews = Array.isArray(dashboard.pendingReviews) ? dashboard.pendingReviews : []
   const supportMessages = Array.isArray(dashboard.supportMessages) ? dashboard.supportMessages : []
@@ -594,6 +607,18 @@ function buildAdminNotifications(dashboard = {}) {
       icon: CreditCard,
       tone: 'emerald',
       meta: 'Package',
+    })
+  }
+
+  if (campaignFollowUps.length > 0) {
+    items.push({
+      id: 'admin-campaign-follow-ups',
+      title: `${campaignFollowUps.length} campaign follow-ups due`,
+      description: 'No reply recorded after 72 hours. Send the next email touch.',
+      to: '/admin/campaigns',
+      icon: Megaphone,
+      tone: 'rose',
+      meta: 'Campaigns',
     })
   }
 
@@ -918,6 +943,8 @@ function SidebarContent({ branding, isEmployer, role }) {
     ? employerSidebarItems
     : role === 'Admin'
       ? sidebarItems
+      : role === 'staff'
+        ? sidebarItems.filter((item) => item.to === '/admin/campaigns')
       : role === 'hiring'
         ? sidebarItems.filter((item) => item.to === '/admin/hiring-team')
         : role === 'account team'

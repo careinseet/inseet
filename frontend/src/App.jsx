@@ -16,6 +16,7 @@ import { AdminRazorpayPage } from './admin/pages/AdminRazorpayPage'
 import { AdminSocialMediaPage } from './admin/pages/AdminSocialMediaPage'
 import { AdminRoleDashboard } from './admin/pages/AdminRoleDashboard'
 import { AdminRolePermissionPage } from './admin/pages/AdminRolePermissionPage'
+import { AdminCampaignsPage } from './admin/pages/AdminCampaignsPage'
 import { FreelancerLayout } from './components/FreelancerLayout'
 import { Layout } from './components/Layout'
 import { EmployerLayout } from './employer/components/EmployerLayout'
@@ -153,6 +154,7 @@ function App() {
         { path: 'candidates', element: <AdminManagementPage type="candidates" /> },
         { path: 'hiring-team', element: <AdminHiringTeamPage /> },
         { path: 'applications', element: <AdminManagementPage type="applications" /> },
+        { path: 'campaigns', element: <AdminCampaignsPage /> },
         { path: 'projects', element: <FreelancerProjectsPage /> },
         { path: 'crm/hiring', element: <AdminHiringPage /> },
         { path: 'crm/hiring/bulk', element: <AdminBulkHiringPage /> },

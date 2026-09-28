@@ -1,10 +1,10 @@
 const mongoose = require('mongoose')
 
 async function connectDB() {
-  const mongoUri = buildMongoUri(process.env.MONGO_URI)
+  const mongoUri = buildMongoUri(process.env.MONGO_URI || process.env.MONGODB_URI)
 
   if (!mongoUri) {
-    throw new Error('MONGO_URI is required. Copy .env.example to .env and set MongoDB connection string.')
+    throw new Error('MONGO_URI (or MONGODB_URI) is required. Copy .env.example to .env and set MongoDB connection string.')
   }
 
   const dbName = getMongoDbName(mongoUri)

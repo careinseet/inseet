@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Eye, EyeOff } from 'lucide-react'
 import { AdminCard, StatusBadge } from '../components/AdminPrimitives'
 import { api } from '../../services/api'
 
@@ -281,10 +282,16 @@ function validateMethod(method, value) {
 }
 
 function LabeledInput({ label, onChange, placeholder, type = 'text', value }) {
+  const [showSecret, setShowSecret] = useState(false)
+  const isSecret = type === 'password'
+
   return (
     <label className="grid gap-1">
       <span className="text-xs font-black uppercase tracking-wide text-slate-400">{label}</span>
-      <input className="input" onChange={(event) => onChange(event.target.value)} placeholder={placeholder} type={type} value={value} />
+      <div className="relative">
+        <input className="input w-full pr-10" onChange={(event) => onChange(event.target.value)} placeholder={placeholder} type={isSecret && showSecret ? 'text' : type} value={value} />
+        {isSecret && <button aria-label={showSecret ? 'Hide secret' : 'Show secret'} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600" onClick={() => setShowSecret((current) => !current)} type="button">{showSecret ? <EyeOff size={17} /> : <Eye size={17} />}</button>}
+      </div>
     </label>
   )
 }

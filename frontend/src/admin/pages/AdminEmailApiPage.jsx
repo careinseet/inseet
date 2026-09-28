@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Eye, EyeOff } from 'lucide-react'
 import { AdminCard, StatusBadge } from '../components/AdminPrimitives'
 import { api } from '../../services/api'
 
@@ -167,7 +168,7 @@ export function AdminEmailApiPage() {
                   <LabeledInput label="SMTP Host" onChange={(value) => update('smtpHost', value)} placeholder="smtp.gmail.com" value={form.smtpHost} />
                   <LabeledInput label="SMTP Port" onChange={(value) => update('smtpPort', value)} placeholder="587" value={form.smtpPort} />
                   <LabeledInput label="SMTP User" onChange={(value) => update('smtpUser', value)} placeholder="your@gmail.com" value={form.smtpUser} />
-                  <LabeledInput label="SMTP Password / App Password" onChange={(value) => update('smtpPassword', value)} placeholder="app password" value={form.smtpPassword} />
+                  <LabeledInput label="SMTP Password / App Password" onChange={(value) => update('smtpPassword', value)} placeholder="app password" type="password" value={form.smtpPassword} />
                 </div>
               )}
               <label className="grid gap-1">
@@ -206,11 +207,17 @@ export function AdminEmailApiPage() {
   )
 }
 
-function LabeledInput({ className = '', label, onChange, placeholder, value }) {
+function LabeledInput({ className = '', label, onChange, placeholder, type = 'text', value }) {
+  const [showPassword, setShowPassword] = useState(false)
+  const isPassword = type === 'password'
+
   return (
     <label className={`grid gap-1 ${className}`}>
       <span className="text-xs font-black uppercase tracking-wide text-slate-400">{label}</span>
-      <input className="input" onChange={(event) => onChange(event.target.value)} placeholder={placeholder} type="text" value={value} />
+      <div className="relative">
+        <input className="input w-full pr-10" onChange={(event) => onChange(event.target.value)} placeholder={placeholder} type={isPassword && showPassword ? 'text' : type} value={value} />
+        {isPassword && <button aria-label={showPassword ? 'Hide password' : 'Show password'} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-600" onClick={() => setShowPassword((current) => !current)} type="button">{showPassword ? <EyeOff size={17} /> : <Eye size={17} />}</button>}
+      </div>
     </label>
   )
 }

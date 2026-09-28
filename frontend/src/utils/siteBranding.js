@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { api } from '../services/api'
+import logoAsset from '../assets/inseet-logo.png'
 
 const BRANDING_STORAGE_KEY = 'siteBranding'
 const BRANDING_EVENT = 'siteBrandingChanged'
@@ -9,7 +10,7 @@ export const defaultSiteBranding = {
   siteName: 'INSEET',
   adminName: 'INSEET Admin',
   recruiterName: 'INSEET Recruiter',
-  logoUrl: '/inseet-logo.png',
+  logoUrl: logoAsset,
   faviconUrl: '/inseet-favicon.png',
   tollFreeNumber: '+91 98765 43210',
   recruiterEmail: 'support@inseet.in',
@@ -152,9 +153,11 @@ function migrateLegacyBranding(branding = {}) {
   const renameAsset = (value, fallback) => {
     const nextValue = typeof value === 'string' ? value.trim() : ''
     if (!nextValue) return fallback
-    return nextValue
+    const migratedValue = nextValue
       .replace(/cromgen-rozgar-logo\.png/gi, 'inseet-logo.png')
       .replace(/cromgen-rozgar-favicon\.png/gi, 'inseet-favicon.png')
+    if (/\/?inseet-logo\.png$/i.test(migratedValue)) return logoAsset
+    return migratedValue
   }
 
   next.siteName = rename(next.siteName)

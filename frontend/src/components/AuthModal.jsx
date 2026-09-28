@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { BriefcaseBusiness, Building2, Lock, Mail, Phone, UserRound, X } from 'lucide-react'
+import { BriefcaseBusiness, Building2, Eye, EyeOff, Lock, Mail, Phone, UserRound, X } from 'lucide-react'
 import { getDashboardPath, getRecruiterVerificationPath, getRecruiterVerificationStatus, normalizeRole, storeAuthSession } from '../routes/authRouting'
 import { api } from '../services/api'
 
@@ -242,13 +242,17 @@ const activeTabClass = 'rounded-[6px] bg-white px-3 py-2 text-[#ff8a00] shadow-s
 const idleTabClass = 'rounded-[6px] px-3 py-2 text-slate-500 transition hover:text-slate-900'
 const submitClass = 'inline-flex min-h-11 items-center justify-center rounded-[7px] bg-[#ff8a00] px-5 py-2.5 text-sm font-black text-white shadow-lg shadow-[#ff8a00]/20 transition hover:-translate-y-0.5 hover:bg-[#e87500] disabled:cursor-not-allowed disabled:opacity-60'
 
-function ModalField({ icon: Icon, label, ...props }) {
+function ModalField({ icon: Icon, label, type = 'text', ...props }) {
+  const [showPassword, setShowPassword] = useState(false)
+  const isPassword = type === 'password'
+
   return (
     <label>
       <span className="text-sm font-bold text-slate-700">{label}</span>
       <div className="mt-2 flex items-center gap-3 rounded-[7px] border border-slate-200 px-4 py-3 focus-within:border-[#ff8a00] focus-within:ring-4 focus-within:ring-orange-100">
         <Icon className="text-[#ff8a00]" size={18} />
-        <input className="w-full bg-transparent text-sm font-semibold outline-none placeholder:text-slate-400" {...props} />
+        <input className="w-full bg-transparent text-sm font-semibold outline-none placeholder:text-slate-400" {...props} type={isPassword && showPassword ? 'text' : type} />
+        {isPassword && <button aria-label={showPassword ? 'Hide password' : 'Show password'} className="text-slate-400 transition hover:text-[#ff8a00]" onClick={() => setShowPassword((value) => !value)} type="button">{showPassword ? <EyeOff size={18} /> : <Eye size={18} />}</button>}
       </div>
     </label>
   )
